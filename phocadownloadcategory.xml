@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="finder" method="upgrade" version="3">
+	<name>plg_finder_phocadownloadcategory</name>
+	<author>Jan Pavelka (www.phoca.cz)</author>
+	<creationDate>01/02/2019</creationDate>
+	<authorEmail></authorEmail>
+	<authorUrl>https://www.phoca.cz</authorUrl>
+	<copyright>Jan Pavelka</copyright>
+	<license>GNU/GPL</license>
+	<version>3.1.7</version>
+	<description>PLG_FINDER_PHOCADOWNLOADCATEGORY_DESCRIPTION</description>
+	<projectName>PhocaDownloadFinderCategoryPlugin</projectName>
+
+	<files>
+		<filename plugin="phocadownloadcategory">index.html</filename>
+		<filename plugin="phocadownloadcategory">phocadownloadcategory.php</filename>
+	</files>
+
+	<languages>
+		<language tag="en-GB">language/en-GB/en-GB.plg_finder_phocadownloadcategory.ini</language>
+		<language tag="en-GB">language/en-GB/en-GB.plg_finder_phocadownloadcategory.sys.ini</language>
+	</languages>
+
+	<administration>
+		<languages>
+			<language tag="en-GB">language/en-GB/en-GB.plg_finder_phocadownloadcategory.ini</language>
+			<language tag="en-GB">language/en-GB/en-GB.plg_finder_phocadownloadcategory.sys.ini</language>
+		</languages>
+	</administration>
+	
+	
+
+	<updateservers>
+		<server type="extension" name="PLG_FINDER_PHOCADOWNLOADCATEGORY" priority="1"><![CDATA[https://raw.githubusercontent.com/PhocaCz/PhocaDownloadFinderCategoryPlugin/master/manifest.xml]]></server>
+	</updateservers>
+</extension>
