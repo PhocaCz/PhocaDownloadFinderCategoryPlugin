@@ -2,7 +2,7 @@
 
 
 
-![Phoca Download Finder Category Plugin](https://github.com/PhocaCz/PhocaDownloadFinderCategoryPlugin/blob/master/phocadownloadcategory.png)
+![Phoca Download Finder Category Plugin](https://github.com/PhocaCz/PhocaDownloadFinderCategoryPlugin/blob/master/phocadownloadcategory.png?raw=true)
 
 # Phoca Download Finder Category Plugin
 
@@ -52,9 +52,17 @@ Phoca Download Finder plugin is a Joomla! plugin which allows you to search for 
 
 
 
-## Version
+## Version (Joomla! 3.x)
 
 3.2.1
+
+## Version (Joomla! 4.x)
+
+4.0.2
+
+## Version (Joomla! 5.x)
+
+5.0.10
 
 
 
@@ -65,3 +73,17 @@ GNU/GPL
 
 
 This project is open source project - feel free to contribute! Thank you.
+
+
+
+## Social Media
+
+- [Phoca on Facebook](https://www.facebook.com/Phoca.cz)
+
+- [Phoca on X (Twitter)](https://twitter.com/PhocaCz)
+
+- [Phoca on YouTube](https://www.youtube.com/user/phocavideos)
+
+- [Phoca on GitHub](https://github.com/PhocaCz)
+
+- [Phoca on Reddit](https://www.reddit.com/user/PhocaCz)

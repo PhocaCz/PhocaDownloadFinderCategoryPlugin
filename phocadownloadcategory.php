@@ -7,11 +7,19 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL
  */
 
-defined('JPATH_BASE') or die;
-require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
-class plgFinderPhocadownloadcategory extends FinderIndexerAdapter
-{
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Factory;
+use Joomla\Component\Finder\Administrator\Indexer\Adapter;
+use Joomla\Component\Finder\Administrator\Indexer\Indexer;
+use Joomla\Database\DatabaseQuery;
+use Joomla\Registry\Registry;
+use Joomla\Component\Finder\Administrator\Indexer\Helper;
 
+defined('JPATH_BASE') or die;
+//require_once JPATH_ADMINISTRATOR . '/components/com_finder/helpers/indexer/adapter.php';
+
+class plgFinderPhocadownloadcategory extends Adapter
+{
 	protected $context 		= 'Phocadownloadcategory';
 	protected $extension 	= 'com_phocadownload';
 	protected $layout 		= 'category';
@@ -49,7 +57,6 @@ class plgFinderPhocadownloadcategory extends FinderIndexerAdapter
 		// Remove the items.
 		return $this->remove($id);
 	}
-
 
 	public function onFinderAfterSave($context, $row, $isNew)
 	{
@@ -121,57 +128,64 @@ class plgFinderPhocadownloadcategory extends FinderIndexerAdapter
 
 	}
 
-	protected function index(FinderIndexerResult $item, $format = 'html')
+	protected function index(Joomla\Component\Finder\Administrator\Indexer\Result $item, $format = 'html')
 	{
 		// Check if the extension is enabled
-		if (JComponentHelper::isEnabled($this->extension) == false)
+		if (ComponentHelper::isEnabled($this->extension) == false)
 		{
 			return;
 		}
 
 		$item->setLanguage();
-		
-		// Initialize the item parameters.
-		$registry = new JRegistry;
-		$registry->loadString($item->params);
-		$item->params = $registry;
 
-		$registry = new JRegistry;
-		$registry->loadString($item->metadata);
-		$item->metadata = $registry;
-		
+		// Initialize the item parameters.
+        if (!empty($item->params)) {
+            $registry = new Registry;
+            $registry->loadString($item->params);
+            $item->params = $registry;
+        }
+        if (!empty($item->metadata)) {
+            $registry = new Registry;
+            $registry->loadString($item->metadata);
+            $item->metadata = $registry;
+        }
 
 		// Build the necessary route and path information.
 		$item->url = $this->getURL($item->id, $this->extension, $this->layout);
 		$item->route = PhocaDownloadRoute::getCategoryRoute($item->id, $item->alias);
-		$item->path = FinderIndexerHelper::getContentPath($item->route);
+		//$item->path = FinderIndexerHelper::getContentPath($item->route);
 
 		/*
 		 * Add the meta-data processing instructions based on the newsfeeds
 		 * configuration parameters.
 		 */
 		// Add the meta-author.
-		$item->metaauthor = $item->metadata->get('author');
+        if (!empty($item->metadata)) {
+             $item->metaauthor = $item->metadata->get('author');
+        }
 
 		// Handle the link to the meta-data.
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'link');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metakey');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metadesc');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'metaauthor');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'author');
-		$item->addInstruction(FinderIndexer::META_CONTEXT, 'created_by_alias');
+		$item->addInstruction(Indexer::META_CONTEXT, 'link');
+		$item->addInstruction(Indexer::META_CONTEXT, 'metakey');
+		$item->addInstruction(Indexer::META_CONTEXT, 'metadesc');
+		$item->addInstruction(Indexer::META_CONTEXT, 'metaauthor');
+		$item->addInstruction(Indexer::META_CONTEXT, 'author');
+		$item->addInstruction(Indexer::META_CONTEXT, 'created_by_alias');
 
 		// Add the type taxonomy data.
 		$item->addTaxonomy('Type', 'Phoca Download Category');
 
+
 		// Add the category taxonomy data.
-		$item->addTaxonomy('Category', $item->category, $item->cat_state, $item->cat_access);
+		if (isset($item->category) && $item->category != '') {
+            $item->addTaxonomy('Category', $item->category, $item->cat_state, $item->cat_access);
+        }
 
 		// Add the language taxonomy data.
 		$item->addTaxonomy('Language', $item->language);
 
 		// Get content extras.
-		FinderIndexerHelper::getContentExtras($item);
+		Helper::getContentExtras($item);
 
 		// Index the item.
 		$this->indexer->index($item);
@@ -182,12 +196,12 @@ class plgFinderPhocadownloadcategory extends FinderIndexerAdapter
 		require_once JPATH_SITE . '/administrator/components/com_phocadownload/libraries/phocadownload/path/route.php';
 		return true;
 	}
-	
+
 	protected function getListQuery($query = null)
-	{	
-		$db = JFactory::getDbo();
+	{
+		$db = Factory::getDbo();
 		// Check if we can use the supplied SQL query.
-		$query = $query instanceof JDatabaseQuery ? $query : $db->getQuery(true)			
+		$query = $query instanceof DatabaseQuery ? $query : $db->getQuery(true)
 			->select('a.id, a.parent_id as catid, a.title, a.alias, "" AS link, a.description AS summary')
 			->select('a.metakey, a.metadesc, a.metadata, a.language, a.access, a.ordering')
 			->select('"" AS created_by_alias, "" AS modified, "" AS modified_by')
@@ -199,7 +213,8 @@ class plgFinderPhocadownloadcategory extends FinderIndexerAdapter
 		$case_when_item_alias = ' CASE WHEN ';
 		$case_when_item_alias .= $query->charLength('a.alias', '!=', '0');
 		$case_when_item_alias .= ' THEN ';
-		$a_id = $query->castAsChar('a.id');
+		//$a_id = $query->castAsChar('a.id');
+		$a_id = $query->castAs('CHAR', 'a.id');
 		$case_when_item_alias .= $query->concatenate(array($a_id, 'a.alias'), ':');
 		$case_when_item_alias .= ' ELSE ';
 		$case_when_item_alias .= $a_id.' END as slug';
@@ -208,7 +223,8 @@ class plgFinderPhocadownloadcategory extends FinderIndexerAdapter
 		$case_when_category_alias = ' CASE WHEN ';
 		$case_when_category_alias .= $query->charLength('c.alias', '!=', '0');
 		$case_when_category_alias .= ' THEN ';
-		$c_id = $query->castAsChar('c.id');
+		//$c_id = $query->castAsChar('c.id');
+		$c_id = $query->castAs('CHAR', 'c.id');
 		$case_when_category_alias .= $query->concatenate(array($c_id, 'c.alias'), ':');
 		$case_when_category_alias .= ' ELSE ';
 		$case_when_category_alias .= $c_id.' END as catslug';
@@ -217,7 +233,6 @@ class plgFinderPhocadownloadcategory extends FinderIndexerAdapter
 			->from('#__phocadownload_categories AS a')
 			->join('LEFT', '#__phocadownload_categories AS c ON c.id = a.parent_id');
 			//->where('a.approved = 1');
-			
 		return $query;
 	}
 
@@ -229,7 +244,7 @@ class plgFinderPhocadownloadcategory extends FinderIndexerAdapter
 
 		return $sql;
 	}
-	
+
 	protected function getStateQuery()
 	{
 		$query = $this->db->getQuery(true);
